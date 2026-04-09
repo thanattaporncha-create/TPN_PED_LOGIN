@@ -297,7 +297,7 @@ body {
     <form onsubmit="handleLogin(event)" class="space-y-4 text-left">
       <div>
         <label class="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-widest">รหัสพนักงาน</label>
-        <input type="text" id="loginUsername" placeholder="เช่น 126107" required
+        <input type="text" id="loginUsername" placeholder="กรอกรหัสพนักงาน" required
           class="w-full p-4 border-2 border-blue-100 rounded-2xl focus:border-blue-500 outline-none font-bold text-center tracking-widest text-blue-700 bg-blue-50/30">
       </div>
       <div>
@@ -1686,7 +1686,15 @@ async function fetchPatientAndHistory() {
         document.getElementById('row-other-vol').textContent = otherVol;
 
         // 13. Prep Column
-        const prepDextroseVol = roundToPlace((dextrosePercent * pnPrepVol * 2) / 100, 2);
+      // 13. Prep Column (ฉบับแก้ไข: ถ้าไม่มี Flush ให้เท่ากับค่าที่สั่ง)
+let prepDextroseVol = 0;
+// ถ้าปริมาตรเตรียม (Prep) เท่ากับปริมาตรสุทธิ (Net) หรือไม่มีการกรอก Flush
+if (Math.abs(pnPrepVol - pnVolume) < 0.1) {
+    prepDextroseVol = roundToPlace(dextroseVolume, 2);
+} else {
+    // กรณีมีการบวก Flush เพิ่มสัดส่วนตามสูตรเดิมของขิม
+    prepDextroseVol = roundToPlace((dextrosePercent * pnPrepVol * 2) / 100, 2);
+}
         document.getElementById('prep-proteinVol').textContent = roundToPlace(proteinVolume, 2);
         document.getElementById('prep-dextroseVol').textContent = prepDextroseVol;
         document.getElementById('prep-phos-vol').textContent = phosVolume;
@@ -1705,19 +1713,35 @@ async function fetchPatientAndHistory() {
         if (!isPrepWaterManual) {
             document.getElementById('prep-waterVolInput').value = roundToPlace(pnPrepVol - allSubstancesPrep, 1);
         }
-        // 14. Osmolarity
+       // 14. Osmolarity 
         const prepVol = pnPrepVol || 1;
-        const selectedProtProductOsmol = document.querySelector('input[name="proteinProduct"]:checked')?.value || 'aminoplasmal';
+        const selectedProtProductOsmol = document.querySelector('input[name="proteinProduct"]:checked')?.value || 'aminoven';
+        
+        // หา AA Grams จากผลิตภัณฑ์ที่เลือก
         const protConcOsmol = (selectedProtProductOsmol === 'aminoplasmal') ? 0.15 : 0.10;
         const aaGrams = proteinVolume * protConcOsmol;
+
+        // คำนวณรายส่วน (หน่วย: mOsmol/L)
         const osmol_AA = (aaGrams * 10 * 1000) / prepVol;
         const osmol_Dex = (prepDextroseVol * 2.5 * 1000) / prepVol;
-        const osmol_Na = (naSource === 'NaAcetate') ? (naVolume * 6000) / prepVol : (naVolume * 1000) / prepVol;
-        const osmol_K = (kSource === 'KAcetate') ? (kVolume * 6000) / prepVol : (kVolume * 4000) / prepVol;
-        const osmol_Ca = (caVolume * 430) / prepVol;
-        const osmol_Mg = (mgVolume * 4000) / prepVol;
-        const osmol_Phos = (phosSource === 'Glycophos') ? (phosVolume * 1000) / prepVol : (phosVolume * 1500) / prepVol;
 
+        // Na: NaCl ใช้ 1 | NaAcetate ใช้ 6
+        const naMult = (naSource === 'NaAcetate') ? 6 : 1;
+        const osmol_Na = (naVolume * naMult * 1000) / prepVol;
+
+        // K: KCl ใช้ 4 | KAcetate ใช้ 6
+        const kMult = (kSource === 'KAcetate') ? 6 : 4;
+        const osmol_K = (kVolume * kMult * 1000) / prepVol;
+
+        // Phos: Glycophos ใช้ 2.7 | K2HPO4 ใช้ 2 ✅ 
+        const phosMult = (phosSource === 'K2HPO4') ? 2 : 2.7;
+        const osmol_Phos = (phosVolume * phosMult * 1000) / prepVol;
+
+        // Calcium: ใช้ 0.67 ✅ | Magnesium: ใช้ 4
+        const osmol_Ca = (caVolume * 0.67 * 1000) / prepVol;
+        const osmol_Mg = (mgVolume * 4 * 1000) / prepVol;
+
+        // --- อัปเดตตัวเลขลงในตารางสรุป (Table) ---
         document.getElementById('proteinOsmol').textContent = Math.round(osmol_AA);
         document.getElementById('dextroseOsmol').textContent = Math.round(osmol_Dex);
         document.getElementById('row-na-osmol').textContent = Math.round(osmol_Na);
@@ -1726,14 +1750,20 @@ async function fetchPatientAndHistory() {
         document.getElementById('row-ca-osmol').textContent = Math.round(osmol_Ca);
         document.getElementById('row-phos-osmol').textContent = Math.round(osmol_Phos);
 
+        // --- สรุปยอดรวม (Total) ---
         const totalOsmolValue = osmol_AA + osmol_Dex + osmol_Na + osmol_K + osmol_Mg + osmol_Ca + osmol_Phos;
-        document.getElementById('totalOsmol').textContent = '~' + Math.round(totalOsmolValue);
-        document.getElementById('finalOsmol').textContent = '~' + Math.round(totalOsmolValue);
+        const roundedTotal = Math.round(totalOsmolValue);
+        
+        document.getElementById('totalOsmol').textContent = '~' + roundedTotal;
+        document.getElementById('finalOsmol').textContent = '~' + roundedTotal;
 
+        // --- ระบบแจ้งเตือนเส้นทางการให้สาร (Route Warning) ---
         const currentRoute = document.querySelector('input[name="route"]:checked')?.value;
         const osmolWarnEl = document.getElementById('osmolWarning');
-        if (osmolWarnEl) osmolWarnEl.classList.toggle('hidden', !(currentRoute === 'peripheral' && totalOsmolValue > 900));
-
+        if (osmolWarnEl) {
+            // ถ้าให้ทาง Peripheral แต่ Osmol เกิน 900 จะแสดงแถบเตือนสีส้ม
+            osmolWarnEl.classList.toggle('hidden', !(currentRoute === 'peripheral' && totalOsmolValue > 900));
+        }
         // 15. Calories
         // เช็คก่อนว่าเลือกตัวไหน: ถ้าเป็น aminoplasmal (15%) ใช้ 0.6 ถ้าตัวอื่นใช้ 0.4
 const pMultiplier = (document.querySelector('input[name="proteinProduct"]:checked')?.value === 'aminoplasmal') ? 0.6 : 0.4;
