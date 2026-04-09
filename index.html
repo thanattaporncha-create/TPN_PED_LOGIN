@@ -283,9 +283,56 @@ body {
   </style>
 </head>
 <body class="bg-gray-50">
-  <div id="app">
+
+<!-- ===== หน้า LOGIN ===== -->
+<div id="loginPage" class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-900 to-blue-700">
+  <div class="max-w-md w-full bg-white p-10 rounded-3xl shadow-2xl text-center">
+    <div class="inline-block p-4 rounded-2xl bg-blue-700 text-white mb-4 shadow-lg">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+      </svg>
+    </div>
+    <h1 class="text-2xl font-black text-blue-900 mb-1 uppercase tracking-tight">TPN Calculator</h1>
+    <p class="text-sm text-gray-400 mb-6">Pediatric Unit | Srinagarind Hospital</p>
+    <form onsubmit="handleLogin(event)" class="space-y-4 text-left">
+      <div>
+        <label class="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-widest">รหัสพนักงาน</label>
+        <input type="text" id="loginUsername" placeholder="เช่น 126107" required
+          class="w-full p-4 border-2 border-blue-100 rounded-2xl focus:border-blue-500 outline-none font-bold text-center tracking-widest text-blue-700 bg-blue-50/30">
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-gray-500 mb-1 uppercase tracking-widest">Password</label>
+        <input type="password" id="loginPassword" placeholder="Password" required
+          class="w-full p-4 border-2 border-blue-100 rounded-2xl focus:border-blue-500 outline-none font-bold text-center tracking-widest text-blue-700 bg-blue-50/30">
+      </div>
+      <p id="loginError" class="hidden text-red-500 font-bold text-sm text-center pt-1">❌ รหัสผิดพลาด กรุณาลองใหม่ค่ะ</p>
+      <button type="submit" id="loginBtn"
+        class="w-full bg-blue-700 hover:bg-blue-800 text-white p-4 rounded-2xl font-black text-lg shadow-xl transition-all mt-2">
+        เข้าสู่ระบบ 🚀
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- ===== หน้าหลัก TPN (ซ่อนไว้ก่อน Login) ===== -->
+<div id="mainApp" class="hidden">
+<div id="app">
     <!-- Header -->
-   <header class="gradient-header text-white py-4 px-6 sticky top-0 z-50 shadow-lg no-print">
+   <!-- แถบแสดงชื่อผู้ใช้ -->
+<div id="userBar" class="bg-blue-950 text-white px-6 py-2 no-print">
+  <div class="max-w-6xl mx-auto flex items-center justify-between text-xs">
+    <span class="text-blue-300">
+      ผู้บันทึก: 
+      <span id="displayUserName" class="font-black text-white ml-1"></span>
+    </span>
+    <button onclick="logout()" 
+      class="text-red-300 hover:text-red-100 font-bold underline transition-all">
+      Logout
+    </button>
+  </div>
+</div>
+
+<header class="gradient-header text-white py-4 px-6 sticky top-0 z-50 shadow-lg no-print">
       <div class="max-w-6xl mx-auto flex items-center justify-between">
         <div class="flex items-center gap-3">
           <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center backdrop-blur-sm">
@@ -1120,14 +1167,73 @@ body {
         </section>
     
       <!-- Footer -->
-      <footer class="text-center py-6 text-gray-500 text-sm">
+    <footer class="text-center py-6 text-gray-500 text-sm">
         <p>TPN Calculator for Pediatric Patients</p>
       </footer>
-    </div>
+    </div><!-- ปิด #app -->
+  </div><!-- ปิด #mainApp -->
 
 
  <script>
-    const API_URL = 'https://script.google.com/macros/s/AKfycbzXUG9mkp9u_FbZFQDCxV7zmgVCg7YxR3YFcyaO92pxQCGbXGcaIXJFFHSVJJ-N9IB_/exec';
+    const API_URL = 'https://script.google.com/macros/s/AKfycbywgGAtxJIO43DGD-dK0B8tOj5SbNxJv2nbOnVitkkdj5xMbi1wcvYJzSwlIAUhbJu8/exec';
+   // ========== LOGIN SYSTEM ==========
+async function handleLogin(e) {
+  if (e) e.preventDefault();
+
+  const u = document.getElementById('loginUsername').value.trim();
+  const p = document.getElementById('loginPassword').value.trim();
+  const btn = document.getElementById('loginBtn');
+  const errMsg = document.getElementById('loginError');
+
+  if (!u || !p) {
+    errMsg.textContent = "⚠️ กรุณากรอกรหัสพนักงานและ Password ค่ะ";
+    errMsg.classList.remove('hidden');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.innerHTML = "⏳ กำลังตรวจสอบ...";
+  errMsg.classList.add('hidden');
+
+  try {
+    const formData = new URLSearchParams();
+    formData.append("action", "login");
+    formData.append("username", u);
+    formData.append("password", p);
+
+    const res = await fetch(API_URL, { method: 'POST', body: formData });
+    const result = await res.json();
+
+    if (result.success) {
+      sessionStorage.setItem('tpnUser', result.name);
+      showMainApp();
+    } else {
+      errMsg.textContent = "❌ รหัสผิดพลาด กรุณาตรวจสอบอีกครั้งค่ะ";
+      errMsg.classList.remove('hidden');
+      btn.disabled = false;
+      btn.innerHTML = "เข้าสู่ระบบ 🚀";
+    }
+  } catch (err) {
+    errMsg.textContent = "❌ เชื่อมต่อไม่ได้ กรุณาลองใหม่ค่ะ";
+    errMsg.classList.remove('hidden');
+    btn.disabled = false;
+    btn.innerHTML = "เข้าสู่ระบบ 🚀";
+  }
+}
+
+function showMainApp() {
+  document.getElementById('loginPage').classList.add('hidden');
+  document.getElementById('mainApp').classList.remove('hidden');
+  const name = sessionStorage.getItem('tpnUser') || '';
+  const el = document.getElementById('displayUserName');
+  if (el) el.textContent = name;
+}
+
+function logout() {
+  sessionStorage.clear();
+  location.reload();
+}
+// ========== END LOGIN ==========
     
     // Global variables
     let isVitalipidManual = false;
@@ -2214,12 +2320,16 @@ function printA4() {
     window.print();
 }
    // ========== Initialize & Event Listeners ==========
-    document.addEventListener('DOMContentLoaded', () => {
-        // 1. ตั้งค่าวันที่ให้เป็น Today ทันทีที่โหลดหน้าจอ
-        const dateInput = document.getElementById('orderDate');
-        if (dateInput) {
-            dateInput.valueAsDate = new Date();
-        }
+  document.addEventListener('DOMContentLoaded', () => {
+    // ✅ ถ้า Login อยู่แล้ว ให้แสดงหน้าหลักเลย
+    if (sessionStorage.getItem('tpnUser')) {
+        showMainApp();
+    }
+
+    const dateInput = document.getElementById('orderDate');
+    if (dateInput) {
+        dateInput.valueAsDate = new Date();
+    }
 
         // 2. ผูกเหตุการณ์การเปลี่ยนค่าต่างๆ ให้ Re-calculate อัตโนมัติ
         document.querySelectorAll('input[name="route"]').forEach(radio => {
