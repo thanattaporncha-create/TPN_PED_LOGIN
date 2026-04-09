@@ -78,7 +78,7 @@
   </main>
 
   <script>
-    const API_URL = 'https://script.google.com/macros/s/AKfycbzOHer0V5bz4T5G8YduNU1Ja4aC9qvIWjW453N90Xyc-BcyFGEWB5TjYVckM-pEN3ZNUw/exec';
+    const API_URL = 'https://script.google.com/macros/s/AKfycbzXUG9mkp9u_FbZFQDCxV7zmgVCg7YxR3YFcyaO92pxQCGbXGcaIXJFFHSVJJ-N9IB_/exec';
     let allOrders = [];
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -206,30 +206,31 @@
               <button onclick="window.open('label_WS.html?hn=${order.hn}&date=${orderDateStr}', '_blank')" class="px-8 py-3 bg-slate-900 hover:bg-black text-white rounded-2xl text-sm font-bold shadow-md flex items-center justify-center gap-2">
                 📝 ฉลาก / Worksheet
               </button>
-              <button onclick="deleteOrder('${order.hn}')" class="px-8 py-3 bg-white hover:bg-rose-50 text-rose-600 border-2 border-rose-100 rounded-2xl text-sm font-bold transition-all">
-                🗑️ OFF TPN
-              </button>
+              <button onclick="deleteOrder('${order.hn}', ${order.row_index})" class="px-8 py-3 bg-white hover:bg-rose-50 text-rose-600 border-2 border-rose-100 rounded-2xl text-sm font-bold transition-all">
+  🗑️ OFF TPN
+</button>
+
             </div>
           </div>
         </div>`;
       }).join('');
     }
 
-    async function deleteOrder(hn) {
-      if (!confirm(`⚠️ ยืนยันการสั่ง OFF TPN สำหรับ HN: ${hn} ?`)) return;
-      const btn = event.currentTarget;
-      const originalText = btn.innerHTML;
-      btn.innerHTML = "⏳ กำลังลบ...";
-      btn.disabled = true;
+   async function deleteOrder(hn, rowIndex) {
+  if (!confirm(`⚠️ ยืนยันการสั่ง OFF TPN สำหรับ HN: ${hn} ?`)) return;
 
-      try {
-        const params = new URLSearchParams();
-        params.append('action', 'deleteRow');
-        params.append('hn', hn);
-        await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: params });
-        setTimeout(() => { alert("✅ Off TPN เรียบร้อยแล้ว"); fetchOrders(); }, 1000);
-      } catch (e) { alert("❌ เกิดข้อผิดพลาด"); btn.innerHTML = originalText; btn.disabled = false; }
-    }
+  try {
+    const params = new URLSearchParams();
+    params.append('action', 'deleteRow');
+    params.append('hn', hn);
+    params.append('row_index', rowIndex);
+    await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: params });
+    setTimeout(() => { alert("✅ Off TPN เรียบร้อยแล้ว"); fetchOrders(); }, 1000);
+  } catch (e) { 
+    alert("❌ เกิดข้อผิดพลาด"); 
+  }
+}
+
 
     document.addEventListener('click', (e) => {
         if (!document.getElementById('filterWardInput').parentElement.contains(e.target)) {
