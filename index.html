@@ -606,7 +606,7 @@ body {
   <h2 class="section-title text-lg font-semibold text-gray-800 mb-4">Macronutrient</h2>
   
   <div class="p-4 bg-purple-50 rounded-xl border border-purple-100 mb-6">
-    <div class="flex flex-wrap gap-2 mb-3">
+ <div class="flex flex-wrap gap-2 mb-3">
     <span class="text-sm font-bold text-purple-800 w-full mb-1">
         เลือก Protein Product: 
         <span class="text-red-600 font-black animate-pulse ml-1">
@@ -614,36 +614,45 @@ body {
         </span>
     </span>
 
-    <input type="radio" name="proteinProduct" id="aminoven" value="aminoven" class="hidden radio-custom" checked onchange="calculateProteinLogic('prot_dose')">
-    <label for="aminoven" class="px-4 py-2 bg-white border-2 border-blue-300 rounded-lg cursor-pointer text-sm font-bold transition-all hover:bg-blue-50">
-        10% Aminoven Infant
-    </label>
+    <div class="flex-1 min-w-[130px] flex flex-col">
+        <input type="radio" name="proteinProduct" id="aminoven" value="aminoven" class="hidden radio-custom" checked onchange="calculateProteinLogic('prot_dose')">
+        <label for="aminoven" class="px-4 py-2 bg-white border-2 border-blue-300 rounded-lg cursor-pointer text-sm font-bold transition-all hover:bg-blue-50 text-center">
+            10% Aminoven Infant
+        </label>
+        <p class="text-[11px] text-black font-bold mt-1 text-center leading-tight">นิยม* แรกเกิด - 1 ปี (ใช้ได้ถึง 14 ปี)</p>
+    </div>
     
-    <input type="radio" name="proteinProduct" id="amiparen" value="amiparen" class="hidden radio-custom" onchange="calculateProteinLogic('prot_dose')">
-    <label for="amiparen" class="px-4 py-2 bg-white border-2 border-green-300 rounded-lg cursor-pointer text-sm font-bold transition-all hover:bg-green-50">
-        10% Ami-PA-REN
-    </label>
+    <div class="flex-1 min-w-[130px] flex flex-col">
+        <input type="radio" name="proteinProduct" id="amiparen" value="amiparen" class="hidden radio-custom" onchange="calculateProteinLogic('prot_dose')">
+        <label for="amiparen" class="px-4 py-2 bg-white border-2 border-green-300 rounded-lg cursor-pointer text-sm font-bold transition-all hover:bg-green-50 text-center">
+            10% Ami-PA-REN
+        </label>
+        <p class="text-[11px] text-black font-bold mt-1 text-center">อายุ 1 เดือน - ผู้ใหญ่</p>
+    </div>
     
-    <input type="radio" name="proteinProduct" id="aminoplasmal" value="aminoplasmal" class="hidden radio-custom" onchange="calculateProteinLogic('prot_dose')">
-    <label for="aminoplasmal" class="px-4 py-2 bg-white border-2 border-orange-300 rounded-lg cursor-pointer text-sm font-bold transition-all hover:bg-orange-50">
-        15% Amino-plasmal
-    </label>
+    <div class="flex-1 min-w-[130px] flex flex-col">
+        <input type="radio" name="proteinProduct" id="aminoplasmal" value="aminoplasmal" class="hidden radio-custom" onchange="calculateProteinLogic('prot_dose')">
+        <label for="aminoplasmal" class="px-4 py-2 bg-white border-2 border-orange-300 rounded-lg cursor-pointer text-sm font-bold transition-all hover:bg-orange-50 text-center">
+            15% Amino-plasmal
+        </label>
+        <p class="text-[11px] text-black font-bold mt-1 text-center">อายุ 2 ปี - ผู้ใหญ่</p>
+    </div>
 </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div>
         <label class="block text-xs font-bold text-gray-500 mb-1">Dose (g/kg/day)</label>
         <input type="number" id="proteinTarget" step="any" inputmode="decimal" class="w-full px-4 py-2 border border-purple-200 rounded-lg font-bold text-purple-700" oninput="calculateProteinLogic('prot_dose')">
-      </div>
-      <div>
+    </div>
+    <div>
         <label class="block text-xs font-bold text-gray-500 mb-1">Total (g/day)</label>
         <input type="number" id="proteinGrams" step="any" inputmode="decimal" class="w-full px-4 py-2 border border-purple-200 rounded-lg font-bold text-purple-700" oninput="calculateProteinLogic('prot_grams')">
-      </div>
-      <div>
+    </div>
+    <div>
         <label class="block text-xs font-bold text-gray-500 mb-1">Protein Vol (ml)</label>
         <input type="number" id="proteinVolInput" step="any" inputmode="decimal" class="w-full px-4 py-2 border border-blue-300 rounded-lg font-bold text-blue-700 bg-blue-50" oninput="calculateProteinLogic('prot_vol')">
-      </div>
     </div>
+</div>
   </div>
 
   <div class="p-4 bg-blue-50 rounded-xl border border-blue-100 mb-4">
