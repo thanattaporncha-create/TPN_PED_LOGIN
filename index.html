@@ -66,6 +66,19 @@
       background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
       border-left: 4px solid #f59e0b;
     }
+    /* คลาสใหม่สำหรับ Osmol Warning ที่ต้อง Take Serious */
+.danger-osmol-pulse {
+    background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
+    border: 4px solid #dc2626 !important;
+    color: #991b1b;
+    box-shadow: 0 0 20px rgba(220, 38, 38, 0.3);
+    animation: pulse-border-red 1.5s infinite;
+}
+
+@keyframes pulse-border-red {
+    0%, 100% { border-color: #dc2626; box-shadow: 0 0 10px rgba(220, 38, 38, 0.2); }
+    50% { border-color: #ff0000; box-shadow: 0 0 25px rgba(255, 0, 0, 0.5); }
+}
     /* คลาสใหม่สำหรับแจ้งเตือนอันตราย (สีแดง) */
 .danger-box {
   background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
@@ -1178,12 +1191,38 @@ body {
     </div>
   </div>
   
-  <div id="osmolWarning" class="hidden mt-4 p-4 warning-box rounded-xl">
-    <div class="flex items-center gap-2 text-amber-800">
-      <span class="text-xl">⚠️</span>
-      <span class="font-medium">Osmolarity สูงเกินไปสำหรับ Peripheral Line (> 900 mOsmol/L) พิจารณาใช้ Central Line</span>
+  <div id="osmolWarning" class="hidden mt-6 p-6 rounded-2xl danger-osmol-pulse">
+    <div class="flex flex-col gap-4">
+        <div class="flex items-center gap-3 text-red-700">
+            <span class="text-4xl animate-bounce">🚨</span>
+            <div>
+                <h3 class="text-xl font-black uppercase tracking-wider">High Osmolarity Alert!</h3>
+                <p class="font-bold text-lg">Osmolarity สูงเกินไปสำหรับ Peripheral Line (ไม่ควรเกิน 900 mOsmol/L)</p>
+            </div>
+        </div>
+
+        <div class="bg-white/80 p-4 rounded-xl border border-red-200 shadow-sm text-gray-800">
+            <p class="font-black text-red-800 mb-2 border-b border-red-200 pb-1 flex items-center gap-2">
+                💡 แนวทางปฏิบัติ/Consult แพทย์:
+            </p>
+            <ul class="space-y-2 text-sm">
+                <li class="flex items-start gap-2">
+                    <span class="text-red-600 font-bold">1.</span>
+                    <span><b>เปลี่ยนเส้นทาง:</b> พิจารณาใช้ <b>Central Line</b></span>
+                </li>
+                <li class="flex items-start gap-2 border-t border-red-50 pt-1">
+                    <span class="text-red-600 font-bold">2.</span>
+                    <span><b>ถ้าเปิด Central Line ไม่ได้ (กรณีไม่จำกัดน้ำ):</b> แนะนำเพิ่ม <b>Sterile water</b> ใน Bag <br>
+                    <i class="text-red-500 text-[11px]">*Note: Total volume และ Rate จะเพิ่มขึ้น, %Glucose จะลดลง ต้องแจ้งแพทย์เพื่อยืนยัน*</i></span>
+                </li>
+                <li class="flex items-start gap-2 border-t border-red-50 pt-1">
+                    <span class="text-red-600 font-bold">3.</span>
+                    <span><b>ถ้าคนไข้จำกัดน้ำ (Fluid Restriction):</b> ปรึกษาแพทย์เพื่อ <b>ลด Amino acid และ/หรือ Glucose</b> ลง เนื่องจากสองตัวนี้มีค่า Osmolarity สูงที่สุด</span>
+                </li>
+            </ul>
+        </div>
     </div>
-  </div>
+</div>
   
       <!-- Save Order Button -->
       <div class="flex gap-2 justify-end mt-10 mb-8">
@@ -1785,13 +1824,21 @@ if (Math.abs(pnPrepVol - pnVolume) < 0.1) {
         document.getElementById('totalOsmol').textContent = '~' + roundedTotal;
         document.getElementById('finalOsmol').textContent = '~' + roundedTotal;
 
-        // --- ระบบแจ้งเตือนเส้นทางการให้สาร (Route Warning) ---
-        const currentRoute = document.querySelector('input[name="route"]:checked')?.value;
-        const osmolWarnEl = document.getElementById('osmolWarning');
-        if (osmolWarnEl) {
-            // ถ้าให้ทาง Peripheral แต่ Osmol เกิน 900 จะแสดงแถบเตือนสีส้ม
-            osmolWarnEl.classList.toggle('hidden', !(currentRoute === 'peripheral' && totalOsmolValue > 900));
-        }
+    // --- ระบบแจ้งเตือนเส้นทางการให้สาร (อัปเดตใหม่) ---
+const currentRoute = document.querySelector('input[name="route"]:checked')?.value;
+const osmolWarnEl = document.getElementById('osmolWarning');
+
+if (osmolWarnEl) {
+    // เงื่อนไข: ถ้าเป็น Peripheral และ Osmol > 900
+    if (currentRoute === 'peripheral' && totalOsmolValue > 900) {
+        osmolWarnEl.classList.remove('hidden');
+        // เพิ่มคลาสกระพริบแดงเข้าไป
+        osmolWarnEl.classList.add('danger-osmol-pulse'); 
+    } else {
+        osmolWarnEl.classList.add('hidden');
+        osmolWarnEl.classList.remove('danger-osmol-pulse');
+    }
+}
         // 15. Calories
         // เช็คก่อนว่าเลือกตัวไหน: ถ้าเป็น aminoplasmal (15%) ใช้ 0.6 ถ้าตัวอื่นใช้ 0.4
 const pMultiplier = (document.querySelector('input[name="proteinProduct"]:checked')?.value === 'aminoplasmal') ? 0.6 : 0.4;
