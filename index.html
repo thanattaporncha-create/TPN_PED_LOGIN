@@ -483,8 +483,11 @@ body {
         <input type="radio" name="vitProduct" id="vitInfant" value="Infant" class="hidden radio-custom" checked onchange="calculateAll()">
         <label for="vitInfant" class="flex-1 px-2 py-2 bg-white border border-blue-300 rounded-lg cursor-pointer text-[11px] font-bold text-center transition-all hover:bg-blue-50 checked:bg-blue-600">🍼 Vitalipid N-Infant</label>
         
-        <input type="radio" name="vitProduct" id="vitAdult" value="Adult" class="hidden radio-custom" onchange="calculateAll()">
-        <label for="vitAdult" class="flex-1 px-2 py-2 bg-white border border-pink-300 rounded-lg cursor-pointer text-[11px] font-bold text-center transition-all hover:bg-pink-50 checked:bg-pink-600">Vitalipid N-ADULT</label>
+        <div class="flex-1">
+    <input type="radio" name="vitProduct" id="vitAdult" value="Adult" class="hidden radio-custom" onchange="calculateAll()">
+    <label for="vitAdult" class="block px-2 py-2 bg-white border border-pink-300 rounded-lg cursor-pointer text-[11px] font-bold text-center transition-all hover:bg-pink-50">Vitalipid N-ADULT</label>
+    <p class="text-[9px] text-red-600 font-bold mt-1 text-center">⚠️ สำหรับอายุ ≥ 11 ปี</p>
+</div>
     </div>
     <div class="relative">
         <input type="number" id="vitalipid" step="0.1" min="0" class="w-full px-4 py-2.5 border border-gray-300 rounded-xl input-focus transition-all pr-12 font-semibold text-blue-700" inputmode="decimal" oninput="handleVitalipidManualChange()">
