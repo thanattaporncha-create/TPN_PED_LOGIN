@@ -870,32 +870,39 @@ body {
     </div>
 
     <div class="p-4 bg-cyan-50 rounded-xl border border-cyan-200">
-      <h3 class="font-semibold text-cyan-800 mb-3">🔬 Trace Elements</h3>
-      <div class="space-y-3">
-        <div class="grid grid-cols-2 gap-2">
-          <div class="relative">
-            <input type="radio" id="tracePeditrace" name="traceSource" value="Peditrace" checked class="hidden peer" onchange="calculateAll()">
-            <label for="tracePeditrace" class="flex items-center justify-center px-2 py-3 border border-gray-300 rounded-lg cursor-pointer text-base font-bold transition-all peer-checked:bg-cyan-600 peer-checked:text-white peer-checked:border-cyan-600 bg-white text-gray-700">Peditrace</label>
-          </div>
-          <div class="relative">
-            <input type="radio" id="traceAddamel" name="traceSource" value="Addamel" class="hidden peer" onchange="calculateAll()">
-            <label for="traceAddamel" class="flex items-center justify-center px-2 py-3 border border-gray-300 rounded-lg cursor-pointer text-base font-bold transition-all peer-checked:bg-teal-600 peer-checked:text-white peer-checked:border-teal-600 bg-white text-gray-700">Addamel-N</label>
-          </div>
+  <h3 class="font-semibold text-cyan-800 mb-3">🔬 Trace Elements</h3>
+  <div class="space-y-3">
+    <div class="grid grid-cols-2 gap-2">
+      <div class="flex flex-col">
+        <div class="relative flex-1">
+          <input type="radio" id="tracePeditrace" name="traceSource" value="Peditrace" checked class="hidden peer" onchange="calculateAll()">
+          <label for="tracePeditrace" class="flex items-center justify-center h-full px-2 py-3 border border-gray-300 rounded-lg cursor-pointer text-base font-bold transition-all peer-checked:bg-cyan-600 peer-checked:text-white peer-checked:border-cyan-600 bg-white text-gray-700 text-center">Peditrace</label>
         </div>
+        <p class="text-[11px] text-black font-bold mt-1 text-center leading-none">ใช้ในทารกแรกเกิด - เด็ก BW < 40 kg</p>
+      </div>
 
-        <div>
-          <div class="flex items-center gap-2">
-            <input type="number" id="tracevol" step="0.1" class="flex-1 px-4 py-3 border border-gray-300 rounded-xl input-focus transition-all font-bold text-lg text-cyan-700" inputmode="decimal" oninput="isTraceVolManual = true; calculateAll()">
-            <span class="text-gray-600 whitespace-nowrap font-medium">ml</span>
-          </div>
-          <div class="mt-3 space-y-1 border-t border-cyan-200 pt-2">
-            <p class="text-xs font-bold text-red-600">Peditrace = 1ml/kg หรือ (Zinc req x BW) ÷ 250 ml (Max 15 ml)</p>
-            <p class="text-xs font-bold text-red-600">Addamel-N = 10 ml/day (Max 10 ml)</p>
-          </div>
-          <p id="traceWarning" class="hidden text-xs text-red-600 mt-1 font-semibold">⚠️ เกินค่าสูงสุด!</p>
+      <div class="flex flex-col">
+        <div class="relative flex-1">
+          <input type="radio" id="traceAddamel" name="traceSource" value="Addamel" class="hidden peer" onchange="calculateAll()">
+          <label for="traceAddamel" class="flex items-center justify-center h-full px-2 py-3 border border-gray-300 rounded-lg cursor-pointer text-base font-bold transition-all peer-checked:bg-teal-600 peer-checked:text-white peer-checked:border-teal-600 bg-white text-gray-700 text-center">Addamel-N</label>
         </div>
+        <p class="text-[11px] text-black font-bold mt-1 text-center leading-none">ใช้ในเด็ก BW ≥ 40 kg และผู้ใหญ่</p>
       </div>
     </div>
+
+    <div>
+      <div class="flex items-center gap-2">
+        <input type="number" id="tracevol" step="0.1" class="flex-1 px-4 py-3 border border-gray-300 rounded-xl input-focus transition-all font-bold text-lg text-cyan-700" inputmode="decimal" oninput="isTraceVolManual = true; calculateAll()">
+        <span class="text-gray-600 whitespace-nowrap font-medium">ml</span>
+      </div>
+      <div class="mt-3 space-y-1 border-t border-cyan-200 pt-2">
+        <p class="text-xs font-bold text-red-600">Peditrace = 1ml/kg หรือ (Zinc req x BW) ÷ 250 ml (Max 15 ml)</p>
+        <p class="text-xs font-bold text-red-600">Addamel-N = 10 ml/day (Max 10 ml)</p>
+      </div>
+      <p id="traceWarning" class="hidden text-xs text-red-600 mt-1 font-semibold">⚠️ เกินค่าสูงสุด!</p>
+    </div>
+  </div>
+</div>
 
   </div>
 </section>
