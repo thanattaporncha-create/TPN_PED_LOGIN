@@ -1205,19 +1205,29 @@ body {
             <p class="font-black text-red-800 mb-2 border-b border-red-200 pb-1 flex items-center gap-2">
                 💡 แนวทางปฏิบัติ/Consult แพทย์:
             </p>
-            <ul class="space-y-2 text-sm">
+            <ul class="space-y-3 text-[15px]">
                 <li class="flex items-start gap-2">
                     <span class="text-red-600 font-bold">1.</span>
                     <span><b>เปลี่ยนเส้นทาง:</b> พิจารณาใช้ <b>Central Line</b></span>
                 </li>
-                <li class="flex items-start gap-2 border-t border-red-50 pt-1">
+                <li class="flex items-start gap-2 border-t border-red-50 pt-2">
                     <span class="text-red-600 font-bold">2.</span>
                     <span><b>ถ้าเปิด Central Line ไม่ได้ (กรณีไม่จำกัดน้ำ):</b> แนะนำเพิ่ม <b>Sterile water</b> ใน Bag <br>
-                    <i class="text-red-500 text-[11px]">*Note: Total volume และ Rate จะเพิ่มขึ้น, %Glucose จะลดลง ต้องแจ้งแพทย์เพื่อยืนยัน*</i></span>
+                    <span class="text-red-600 font-bold underline italic">*Note: Total volume และ Rate จะเพิ่มขึ้น, %Glucose จะลดลง ต้องแจ้งแพทย์เพื่อยืนยัน*</span></span>
                 </li>
-                <li class="flex items-start gap-2 border-t border-red-50 pt-1">
+                <li class="flex items-start gap-2 border-t border-red-50 pt-2">
                     <span class="text-red-600 font-bold">3.</span>
                     <span><b>ถ้าคนไข้จำกัดน้ำ (Fluid Restriction):</b> ปรึกษาแพทย์เพื่อ <b>ลด Amino acid และ/หรือ Glucose</b> ลง เนื่องจากสองตัวนี้มีค่า Osmolarity สูงที่สุด</span>
+                </li>
+                <li class="flex items-start gap-2 border-t border-red-50 pt-2 bg-blue-50/50 p-2 rounded-lg">
+                    <span class="text-blue-700 font-bold">4.</span>
+                    <span><b>กรณีเด็กแรกเกิด (New born, NICU, 2ค):</b> บางครั้งยอมให้ได้ถึง <b>1400 mOsmol/L</b> ไม่เกิน 5 วัน (ขึ้นกับดุลยพินิจแพทย์) <br>
+                    <span class="text-blue-800 font-bold italic">*หากไม่ใช่ NICU และ 2ค แนะนำ Confirm แพทย์ทุกครั้ง*</span></span>
+                </li>
+                <li class="flex items-start gap-2 border-t border-red-50 pt-2 bg-amber-50/50 p-2 rounded-lg">
+                    <span class="text-amber-700 font-bold">5.</span>
+                    <span><b>การบันทึกข้อมูล:</b> หากแพทย์ยืนยันใช้สูตรเดิมใน P-line ให้บันทึกในใบ Order ว่า: <br>
+                    <span class="text-amber-800 font-black">"แพทย์ยืนยันใช้ Osmolarity = <span id="osmolInText">____</span> พร้อมระบุชื่อแพทย์"</span></span>
                 </li>
             </ul>
         </div>
@@ -1824,16 +1834,20 @@ if (Math.abs(pnPrepVol - pnVolume) < 0.1) {
         document.getElementById('totalOsmol').textContent = '~' + roundedTotal;
         document.getElementById('finalOsmol').textContent = '~' + roundedTotal;
 
-    // --- ระบบแจ้งเตือนเส้นทางการให้สาร (อัปเดตใหม่) ---
+   // --- ระบบแจ้งเตือนเส้นทางการให้สาร (เวอร์ชันละเอียดยิบ) ---
 const currentRoute = document.querySelector('input[name="route"]:checked')?.value;
 const osmolWarnEl = document.getElementById('osmolWarning');
+const osmolInText = document.getElementById('osmolInText'); // เพิ่มตัวแปรนี้
 
 if (osmolWarnEl) {
-    // เงื่อนไข: ถ้าเป็น Peripheral และ Osmol > 900
     if (currentRoute === 'peripheral' && totalOsmolValue > 900) {
         osmolWarnEl.classList.remove('hidden');
-        // เพิ่มคลาสกระพริบแดงเข้าไป
-        osmolWarnEl.classList.add('danger-osmol-pulse'); 
+        osmolWarnEl.classList.add('danger-osmol-pulse');
+        
+        // ใส่ตัวเลข Osmol ที่คำนวณได้ลงในช่องว่างในข้อ 5 ให้อัตโนมัติ
+        if (osmolInText) {
+            osmolInText.textContent = Math.round(totalOsmolValue) + " mOsmol/L";
+        }
     } else {
         osmolWarnEl.classList.add('hidden');
         osmolWarnEl.classList.remove('danger-osmol-pulse');
