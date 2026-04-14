@@ -171,7 +171,7 @@
         const isCentral = order.route?.toLowerCase().includes('central');
         
         // --- ส่วนที่แก้: คำนวณวันที่สำหรับส่งไปหน้าพิมพ์ ---
-        const orderDateStr = order.order_date ? new Date(order.order_date).toISOString().split('T')[0] : '';
+       const orderDateStr = order.order_date ? order.order_date.substring(0, 10) : '';
         
         return `
         <div class="bg-white rounded-[2.5rem] border border-gray-200 p-8 mb-5 shadow-sm hover:shadow-md transition-all duration-300 animate-fade-in group">
