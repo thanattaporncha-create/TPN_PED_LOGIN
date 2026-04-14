@@ -84,7 +84,7 @@
     window.location.href = "index.html"; // ดีดกลับหน้าแรก
   }
     
-    const API_URL = 'https://script.google.com/macros/s/AKfycbywgGAtxJIO43DGD-dK0B8tOj5SbNxJv2nbOnVitkkdj5xMbi1wcvYJzSwlIAUhbJu8/exec';
+    const API_URL = 'https://script.google.com/macros/s/AKfycbxgepryACUPE2n1WleAvYgLvW02cukl4V2zctGtvlEMDFpjHXIg-KppLJZTme0ZFJKe/exec';
     let allOrders = [];
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -145,11 +145,11 @@
 
       const filtered = allOrders.filter(o => {
         let matchDate = true;
-        if (fDate && o.order_date) {
-          const d = new Date(o.order_date);
-          const formattedO = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-          matchDate = (formattedO === fDate);
-        }
+       if (fDate && o.order_date) {
+  // ตัดสตริงมาเทียบกันตรงๆ เลย ไม่ต้องผ่าน new Date()
+  const orderDatePart = o.order_date.toString().substring(0, 10); 
+  matchDate = (orderDatePart === fDate);
+}
         const matchWard = fWard ? o.ward === fWard : true;
         const matchSearch = fSearch ? (
             (o.hn && o.hn.toString().toLowerCase().includes(fSearch)) || 
@@ -222,21 +222,42 @@
       }).join('');
     }
 
-   async function deleteOrder(hn, rowIndex) {
+async function deleteOrder(hn, rowIndex) {
   if (!confirm(`⚠️ ยืนยันการสั่ง OFF TPN สำหรับ HN: ${hn} ?`)) return;
 
+  // หาปุ่มที่เพิ่งกด เพื่อเปลี่ยนสถานะ (ป้องกันการกดซ้ำ)
+  const btn = event.currentTarget;
+  const originalText = btn.innerHTML;
+  
   try {
+    btn.disabled = true;
+    btn.innerHTML = "⏳ กำลังดำเนินการ...";
+
     const params = new URLSearchParams();
     params.append('action', 'deleteRow');
     params.append('hn', hn);
     params.append('row_index', rowIndex);
-    await fetch(API_URL, { method: 'POST', mode: 'no-cors', body: params });
-    setTimeout(() => { alert("✅ Off TPN เรียบร้อยแล้ว"); fetchOrders(); }, 1000);
+
+    // ส่งข้อมูลแบบ POST
+    await fetch(API_URL, { 
+      method: 'POST', 
+      mode: 'no-cors', // ยังต้องใช้ถ้า Apps Script ไม่ได้ทำ CORS ไว้
+      body: params 
+    });
+
+    // เนื่องจากใช้ no-cors เราเช็ค response ไม่ได้ 
+    // จึงใช้ความหน่วงเวลาเพื่อให้มั่นใจว่า Server ประมวลผลเสร็จแล้วค่อย Refresh
+    setTimeout(() => { 
+      alert(`✅ สั่ง Off TPN (HN: ${hn}) เรียบร้อยแล้ว`); 
+      fetchOrders(); 
+    }, 1500);
+
   } catch (e) { 
-    alert("❌ เกิดข้อผิดพลาด"); 
+    alert("❌ เกิดข้อผิดพลาดในการเชื่อมต่อ"); 
+    btn.disabled = false;
+    btn.innerHTML = originalText;
   }
 }
-
 
     document.addEventListener('click', (e) => {
         if (!document.getElementById('filterWardInput').parentElement.contains(e.target)) {
