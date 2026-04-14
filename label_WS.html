@@ -126,6 +126,11 @@
   <div id="ws-area" class="print-area"></div>
 
 <script>
+  // ⚠️ ยามเฝ้าประตู: เช็คว่า Login หรือยัง?
+  if (!sessionStorage.getItem('tpnUser')) {
+    alert("⚠️ กรุณาเข้าสู่ระบบก่อนใช้งานนะคะ");
+    window.location.href = "index.html"; // ดีดกลับหน้าแรก
+  }
   const API_URL = 'https://script.google.com/macros/s/AKfycbywgGAtxJIO43DGD-dK0B8tOj5SbNxJv2nbOnVitkkdj5xMbi1wcvYJzSwlIAUhbJu8/exec';
   let rawData = null;
 
