@@ -84,7 +84,7 @@
     }
     
     // API ของฝั่ง PED
-    const API_URL = 'https://script.google.com/macros/s/AKfycby_HQ2szSNH1KxowBT5TYSH4W01dX5yQ5Z0rNm299Xa9tw0hcDpBhE2EjolwAtilD8/exec';
+    const API_URL = 'https://script.google.com/macros/s/AKfycbyA9yiKs7jjm2OYTlWG27vl4o849QG6brs3BDokzwAMesEK3FHAYtgD-T2kbmvLMeUU/exec';
     let allOrders = [];
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -138,27 +138,26 @@
     }
 
     function renderCards() {
-      const container = document.getElementById('cardContainer');
-      const countEl = document.getElementById('caseCount');
-      const fDate = document.getElementById('filterDate').value;
-      const fWard = document.getElementById('filterWardValue').value;
-      const fSearch = document.getElementById('filterSearch').value.toLowerCase();
+  const container = document.getElementById('cardContainer');
+  const countEl = document.getElementById('caseCount');
+  const fDate = document.getElementById('filterDate').value; // ค่าจะเป็น "2026-04-14"
+  const fWard = document.getElementById('filterWardValue').value;
+  const fSearch = document.getElementById('filterSearch').value.toLowerCase();
 
-      const filtered = allOrders.filter(o => {
-        let matchDate = true;
-        if (fDate && o.order_date) {
-          // ใช้เทคนิคเดียวกับ NICU เพื่อแก้ปัญหาวันที่เพี้ยน
-          const orderDatePart = o.order_date.toString().split('T')[0];
-          matchDate = (orderDatePart === fDate);
-        }
-        const matchWard = fWard ? o.ward === fWard : true;
-        const matchSearch = fSearch ? (
-            (o.hn && o.hn.toString().toLowerCase().includes(fSearch)) || 
-            (o.patient_name && o.patient_name.toLowerCase().includes(fSearch))
-        ) : true;
-        return matchDate && matchWard && matchSearch;
-      });
-
+  const filtered = allOrders.filter(o => {
+    let matchDate = true;
+    if (fDate && o.order_date) {
+      // เทียบ String ตรงๆ ไม่ต้องสร้าง new Date() ใหม่เพื่อกัน Timezone เพี้ยน
+      const orderDatePart = o.order_date.toString().substring(0, 10);
+      matchDate = (orderDatePart === fDate);
+    }
+    const matchWard = fWard ? o.ward === fWard : true;
+    const matchSearch = fSearch ? (
+        (o.hn && o.hn.toString().toLowerCase().includes(fSearch)) || 
+        (o.patient_name && o.patient_name.toLowerCase().includes(fSearch))
+    ) : true;
+    return matchDate && matchWard && matchSearch;
+  });
       countEl.textContent = filtered.length;
       if (filtered.length === 0) { 
           container.innerHTML = `<div class="text-center py-20 bg-white rounded-[3rem] border-2 border-dashed border-gray-200">
