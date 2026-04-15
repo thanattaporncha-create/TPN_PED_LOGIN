@@ -200,7 +200,7 @@
   }
 
   function createPN(o, bNum, div) {
-    const expDate = new Date(); expDate.setDate(expDate.getDate() + 1);
+    const expDate = new Date(o.order_date); expDate.setDate(expDate.getDate() + 1);
     const routeDisplay = o.route === 'central' ? 'C-line' : (o.route === 'peripheral' ? 'P-line' : o.route);
     const proteinDisplay = o.protein_product === 'aminoven' ? '10% Aminoven-Infant' : o.protein_product === 'amiparen' ? '10% Amiparen' : '15% Aminoplasmal';
     const phosDisplay = o.phos_source === 'Glycophos' ? 'Glycophos (P)' : 'K2HPO4 (P)';
